@@ -2,7 +2,7 @@
     "use strict";
     //created folderPluginContent module
     angular
-        .module('folderPluginContent', ['ui.tinymce', 'folderPluginServices'])
+        .module('folderPluginContent', ['ui.tinymce','folderPluginServices'])
         .provider('Buildfire', [function () {
             this.$get = function () {
                 return buildfire;

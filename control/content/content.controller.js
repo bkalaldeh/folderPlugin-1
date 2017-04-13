@@ -181,7 +181,7 @@
                             scopeItems.push(itemIds[i]);
                         }
                     }
-
+                    console.log('pikapika2',itemIds);
                     Utility.digest($scope);
                 };
 
@@ -194,6 +194,10 @@
 
                     Utility.digest($scope);
                 };
+
+                plugins.onAddTag = function(item,index){
+
+                }
 
                 plugins.onOrderChange = function (item, oldIndex, newIndex) {
                     var items = $scope.data._buildfire.plugins.data;
