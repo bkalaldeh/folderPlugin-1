@@ -6,6 +6,7 @@
     <!-- CSS -->
     <link href="../../../../styles/helper.css" rel="stylesheet">
     <link href="../../../../styles/siteIcons.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <!-- JS -->
     <script src="../../../../scripts/buildfire.js"></script>
     <script src="../../../../scripts/angular/angular.min.js"></script>
@@ -13,6 +14,8 @@
     <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
     <script src="../../../../scripts/tinymce/ui-tinymce.js"></script>
     <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
     <script src="../../../../scripts/sortable.min.js"></script>
     <script src="../../../../scripts/buildfire/components/carousel/carousel.js"></script>
     <script src="../../../../scripts/buildfire/components/notifications/notifications.js"></script>
@@ -39,5 +42,78 @@
         <hr class="none">
         <div id="plugins"></div>
     </div>
+
+
+
+
+
+    <div id="addTags" class="modal fade" tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog" role="document" style="width: 85%;">
+            <div class="modal-content">
+
+                <div  class="header clearfix border-bottom-grey ng-scope"> <h4 class="margin-zero">Add/Remove Tags</h4>
+                    <span class="icon icon-cross2 close-modal close" data-dismiss="modal" aria-label="Close""></span>
+                </div>
+                <hr class="none ng-scope">
+                <div class="ng-scope" id="divLinkToAppContent">
+
+                    <div class="padded padding-top-zero">
+                        <div class="item clearfix row" style="margin-bottom: 25px;">
+                            <div class="main col-xs-12 pull-right padding-left-zero row">
+                                <div class="clearfix">
+                                    <div class="pull-left inner-main col-xs-6 padding-left-zero">
+                                        <input type="text" class="form-control ng-pristine ng-valid ng-touched" placeholder="Tag Title" >
+                                    </div>
+                                    <div class="col-xs-3 pull-right padding-left-zero">
+                                        <a class="btn btn-warning pull-right stretch" >Add Required Tag</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item clearfix row">
+                            <div class="col-xs-12">
+                                <table class="table border-radius-four">
+                                    <thead>
+                                    <tr>
+                                        <th>Tag Title</th>
+                                        <th>Applied More Than</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>tool-pusher</td>
+                                            <td>1</td>
+                                            <td><a class="btn stretch ng-binding btn-danger" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>upper-management</td>
+                                            <td>1</td>
+                                            <td><a class="btn stretch ng-binding btn-danger" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td><a class="btn stretch ng-binding btn-success" style="margin-top:-15px; position:relative; top:5px;">Save</a></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <hr class="">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<style>
+    #addTags .modal-dialog,#addTags:before{display:inline-block;vertical-align:middle}#addTags{text-align:center;padding:0!important}#addTags:before{content:'';height:100%;margin-right:-4px}#addTags .modal-dialog{text-align:left}.inmplayer-popover-wrapper{background-color:#fff;color:#222;border-style:solid;border-color:silver;border-width:1px;-webkit-border-radius:6px;-moz-border-radius:6px;border-radius:6px}.inmplayer-button,.inmplayer-popover-button-end,.inmplayer-popover-button-next,.inmplayer-popover-button-previous{background-color:#03a9f4;color:#fff;border-style:solid;border-color:#007db6;border-width:1px;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}.inmplayer-popover-pointer-shape{fill:#03a9f4;stroke:#03a9f4;stroke-width:1px}.inmplayer-launcher{background-color:#c00;color:#fff;border-style:solid;border-color:#fff;border-width:2%;-webkit-border-radius:50%;-moz-border-radius:50%;border-radius:50%}.inmplayer-panel-header,.inmplayer-trigger{background-color:#03a9f4;color:#fff}.inmplayer-panel-close-button{background-color:transparent}.inmplayer-article-item-title{display:none}h1,h2,h3,h4{color:#09a3ee}.inmplayer-trigger{margin-right:80px;margin-bottom:13px}.inmplayer-popover-branding{display:none!important}
+</style>
+
+
 </body>
 </html>

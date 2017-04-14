@@ -3,7 +3,7 @@
 
     angular
         .module('folderPluginContent')
-        .controller('folderPluginCtrl', ['$scope', 'Messaging', 'Utility','Modal',
+        .controller('folderPluginCtrl', ['$scope', 'Messaging', 'Utility',
             function ($scope, Messaging, Utility) {
                 var tmpCarousalData = null;
                 var editor = new buildfire.components.carousel.editor("#carousel");
@@ -181,7 +181,6 @@
                             scopeItems.push(itemIds[i]);
                         }
                     }
-                    console.log('pikapika2',itemIds);
                     Utility.digest($scope);
                 };
 

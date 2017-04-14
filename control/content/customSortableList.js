@@ -184,6 +184,13 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             addTagButton = document.createElement('a'),
             deleteButton = document.createElement("span");
 
+            //addTagButton.setAttribute("ng-click", "this._tagModalOpen('asd')");
+
+
+
+
+
+
         // Add the required classes to the elements
         wrapper.className = "d-item clearfix";
         moveHandle.className = "icon icon-menu cursor-grab pull-left";
@@ -223,7 +230,6 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             //navigateButton.className = "btn-icon btn-link-icon btn-primary";
             //buttonsWrapper.appendChild(navigateButton);
         }
-
 
 
         buttonsWrapper.appendChild(deleteButton);
@@ -271,11 +277,15 @@ buildfire.components.pluginInstance.sortableList.prototype = {
 
             addTagButton.addEventListener("click", function (e) {
                 e.preventDefault();
+                var itemIndex = me._getItemIndex(item);
+                var itemId = me.items[itemIndex].instanceId;
+                console.log(itemIndex,itemId);
+                $("#addTags").modal({backdrop:false});
 
-                   console.log('Popup Create');
 
 
             });
+
         })(item);
     },
 
@@ -451,4 +461,8 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             buttonSelector.setAttribute("disabled", "disabled");
         }
     }
+
+
+
+
 };

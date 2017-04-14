@@ -122,10 +122,5 @@
                     }
                 }
             }
-        })
-
-
-        .service('Modal', function () {
-            console.log('asd');
-            )};
+        });
 })(window.angular, window.buildfire);
