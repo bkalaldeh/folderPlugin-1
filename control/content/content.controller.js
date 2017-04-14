@@ -3,7 +3,7 @@
 
     angular
         .module('folderPluginContent')
-        .controller('folderPluginCtrl', ['$scope', 'Messaging', 'Utility',
+        .controller('folderPluginCtrl', ['$scope', 'Messaging', 'Utility','Modal',
             function ($scope, Messaging, Utility) {
                 var tmpCarousalData = null;
                 var editor = new buildfire.components.carousel.editor("#carousel");
