@@ -184,7 +184,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             addTagButton = document.createElement('a'),
             deleteButton = document.createElement("span");
 
-            //addTagButton.setAttribute("ng-click", "this._tagModalOpen('asd')");
+        //addTagButton.setAttribute("ng-click", "this._tagModalOpen('asd')");
 
 
 
@@ -275,20 +275,77 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                 }
             });
 
+
+
             addTagButton.addEventListener("click", function (e) {
                 e.preventDefault();
                 var itemIndex = me._getItemIndex(item);
                 var itemId = me.items[itemIndex].instanceId;
-                console.log(itemIndex,itemId);
+                //console.log(itemIndex,itemId);
+
+
+
+
+                /* Get Datastore Tags */
+                function getTags(itemId){
+                    buildfire.datastore.get('tag_'+itemId,function(err,data){
+
+                        if(err)
+                            console.log('there was a problem retrieving your data');
+                        else
+                            var vars = data;
+                            console.log(data);
+                        var div = '';
+                        $.each(vars.data, function (key, value) {
+                            div += '<tr class="div_'+key+'">';
+                            div += '<td>'+key+'</td>';
+                            div += '<td>1</td>';
+                            div += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="'+itemId+'" data-key="'+key+'" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
+                            div += '</tr>';
+                        });
+                        document.getElementById("tagsTable").innerHTML = div;
+                    })
+                }
+
+
+                /* Remove Tag */
+                $(document).on('click','.removeButton',function(){
+
+                    var key = $(this).data('key');
+                    var item = $(this).data('item');
+
+
+                    $('.div_'+ key).remove();
+
+                    var tags = {}
+                    $("#tagsTable tr").each(function(){
+                        var td = $(this).find('td').first();
+                        td = td[0].innerHTML;
+                        tags[td] = 'selamlar';
+                    });
+
+                    buildfire.datastore.save(tags, 'tag_'+itemId ,false,function(err,data){
+                        if(err)
+                            console.log('there was a problem saving your data');
+                        else
+                            console.log( 'saved successfully' );
+                    });
+
+
+
+                });
+
+                getTags(itemId);  /* Get Datastore Tags */
+
+
+
+
+
                 $("#addTags").modal({backdrop:false});
-
-
-
             });
 
         })(item);
     },
-
     _getOffset: function (el) {
         el = el.getBoundingClientRect();
         return {
