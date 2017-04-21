@@ -64,6 +64,8 @@
                     } else {
                         $scope.data.plugins = plugins;
                     }
+
+
                 }
 
                 /*
@@ -85,6 +87,14 @@
 
 
                     preparePluginsData(data.plugins);
+
+
+                    buildfire.userData.get('testusertag', function (err, data) {
+                        if (err)
+                            console.log('there was a problem retrieving your data');
+                        else
+                            $scope.usertags = JSON.stringify(data);
+                    });
 
 
                     if (currentCount) {
@@ -111,7 +121,7 @@
 
                 $scope.safeHtml = function (html) {
                     if (html) {
-                        var $html = $('<div />', { html: html });
+                        var $html = $('<div />', {html: html});
                         $html.find('iframe').each(function (index, element) {
                             var src = element.src;
                             console.log('element is: ', src, src.indexOf('http'));
@@ -122,7 +132,7 @@
                     }
                 };
 
-                var searchOptions = { pageIndex: 0, pageSize: 10 };
+                var searchOptions = {pageIndex: 0, pageSize: 10};
 
                 function dataLoadedHandler(result) {
                     $scope.data = result.data;
@@ -149,6 +159,8 @@
                             if (result.data._buildfire && pluginsList && pluginsList.result && pluginsList.data) {
                                 result.data.plugins = Utility.getPluginDetails(result.data._buildfire.plugins.result, result.data._buildfire.plugins.data);
                             }
+
+
                             bind(result.data);
                             $scope.imagesUpdated = !!result.data.plugins;
                         }
@@ -174,6 +186,8 @@
                             dataLoadedHandler(obj);
                         }
                     });
+
+
                 }
 
                 loadData();
@@ -234,13 +248,75 @@
 
                 $scope.navigateToPlugin = function (plugin) {
 
-                    buildfire.navigation.navigateTo({
-                        pluginId: plugin.pluginTypeId,
-                        instanceId: plugin.instanceId,
-                        title: plugin.title,
-                        folderName: plugin.folderName
+
+                    var tagControl = false;
+                    var searchOptions = {
+                        "skip": "20",
+                        "limit": "10"
+                    };
+                    console.log( );
+                    buildfire.auth.getCurrentUser(function (err, user) {
+                        if(err){
+                            console.log('there was a problem retrieving your data');
+                        }else{
+                            var tags = user.tags[buildfire._context.appId];
+                            var tagarray = [];
+                            for(var k in tags){
+                                tagarray.push = tags[k].tagName
+                            }
+                            buildfire.datastore.search(searchOptions, 'tag_' + plugin.instanceId, function (err, records) {
+                                var plugintags = records;
+                                console.log(tagarray, plugintags)
+                            })
+                        }
+                    })
+                    /*buildfire.auth.getCurrentUser(function (err, user) {
+                        if (err)
+                            console.log('there was a problem retrieving your data');
+                        else {
+                            //console.log('Get User Tags',user.tags);
+                            angular.forEach(user.tags, function (value, key) {
+                                //console.log('DataKey',key);
+                                //console.log('DataValue',value);
+                                angular.forEach(value, function (Datavalue, Datakey) {
+                                    var userTag = Datavalue.tagName;
+                                    buildfire.datastore.search(searchOptions, 'tag_' + plugin.instanceId, function (err, records) {
+                                        if (err)
+                                            console.log('there was a problem retrieving your data');
+                                        else {
+                                            angular.forEach(records, function (value, key) {
+                                                angular.forEach(value.data, function (datakey2, datavalue2) {
+                                                    console.log('DataValue', datavalue2);
+                                                    console.log('userTag', userTag);
+                                                    if (userTag == datavalue2) {
+                                                        tagControl = true;
+                                                    }
+                                                });
+                                            });
+                                        }
+                                    });
+                                });
+                            });
+                        }
                     });
+                    */
+
+                    console.log('Tag Control', tagControl);
+
+                    if (!tagControl) {
+                        alert('Access Denied!');
+                    } else {
+                        buildfire.navigation.navigateTo({
+                            pluginId: plugin.pluginTypeId,
+                            instanceId: plugin.instanceId,
+                            title: plugin.title,
+                            folderName: plugin.folderName
+                        });
+                    }
+
+
                 };
+
 
                 $scope.paging = function () {
                     if ($scope.data.content && $scope.data.content.loadAllPlugins && !loadingData && pagesCount > 1) {
@@ -303,17 +379,17 @@
                             case 'OPEN_PLUGIN':
                                 console.log('came here plugin', event.message.data);
                                 var fName = '';
-                        if (plugin && plugin.pluginType && plugin.pluginType.folderName)
-                            fName = plugin.pluginType.folderName;
-                        else if (plugin && plugin.folderName)
-                            fName = plugin.folderName;
+                                if (plugin && plugin.pluginType && plugin.pluginType.folderName)
+                                    fName = plugin.pluginType.folderName;
+                                else if (plugin && plugin.folderName)
+                                    fName = plugin.folderName;
 
-                        buildfire.navigation.navigateTo({
-                            pluginId: plugin.pluginId,
-                            instanceId: plugin.instanceId,
-                            title: plugin.title,
-                            folderName: fName
-                        });
+                                buildfire.navigation.navigateTo({
+                                    pluginId: plugin.pluginId,
+                                    instanceId: plugin.instanceId,
+                                    title: plugin.title,
+                                    folderName: fName
+                                });
                                 break;
                         }
                     }

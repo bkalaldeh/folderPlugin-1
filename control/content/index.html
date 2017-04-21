@@ -62,14 +62,15 @@
                             <div class="main col-xs-12 pull-right padding-left-zero row">
                                 <div class="clearfix">
                                     <div class="pull-left inner-main col-xs-6 padding-left-zero">
-                                        <input type="text" class="form-control ng-pristine ng-valid ng-touched" placeholder="Tag Title" >
+                                        <input type="text" class="newtaginput form-control ng-pristine ng-valid ng-touched" placeholder="Tag Title" >
                                     </div>
                                     <div class="col-xs-3 pull-right padding-left-zero">
-                                        <a class="btn btn-warning pull-right stretch" >Add Required Tag</a>
+                                        <a class="addButton btn btn-warning pull-right stretch" >Add Required Tag</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" name="itemId" value="" >
                         <div class="item clearfix row">
                             <div class="col-xs-12">
                                 <table class="table border-radius-four">
@@ -83,13 +84,7 @@
                                     <tbody id="tagsTable">
 
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td><a class="btn stretch ng-binding btn-success" style="margin-top:-15px; position:relative; top:5px;">Save</a></td>
-                                        </tr>
-                                    </tfoot>
+
                                 </table>
                             </div>
                             <hr class="">

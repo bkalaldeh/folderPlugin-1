@@ -276,6 +276,95 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             });
 
 
+            /* Get Datastore Tags */
+            function getTags(itemId){
+
+                var loading = '<tr><td colspan="3" align="center"><img src="loading.gif" /></td></tr>';
+                $("#tagsTable").html(loading);
+
+                buildfire.datastore.get('tag_'+itemId,function(err,data){
+                    if(err)
+                        console.log('there was a problem retrieving your data');
+                    else
+                        var vars = data;
+                    console.log(data);
+                    var div = '';
+
+
+                    $.each(vars.data, function (key, value) {
+                        div += '<tr class="div_'+key+'">';
+                        div += '<td>'+key+'</td>';
+                        div += '<td>1</td>';
+                        div += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="'+itemId+'" data-key="'+key+'" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
+                        div += '</tr>';
+                    });
+
+
+
+                    $("input[name='itemId']").val(itemId);
+
+                    document.getElementById("tagsTable").innerHTML = div;
+                })
+            }
+
+
+            /* Remove Tag */
+            $(document).on('click','.removeButton',function(e){
+                e.preventDefault();
+
+                var key = $(this).data('key');
+                var item = $(this).data('item');
+
+                $('.div_'+ key).remove();
+
+                var tags = {}
+                $("#tagsTable tr").each(function(){
+                    var td = $(this).find('td').first();
+                    td = td[0].innerHTML;
+                    tags[td] = 'selamlar';
+                });
+
+                buildfire.datastore.save(tags, 'tag_'+item ,function(err,data){
+                    if(err)
+                        console.log('there was a problem saving your data');
+                    else
+                        console.log( 'saved successfully' );
+                });
+            });
+
+            /* Add Tag */
+            $(document).on('click','.addButton',function(e){
+                e.preventDefault();
+
+                var newtag = $('.newtaginput').val();
+                var itemId = $("input[name='itemId']").val();
+
+                var tags = {}
+                $("#tagsTable tr").each(function(){
+                    var td = $(this).find('td').first();
+                    td = td[0].innerHTML;
+                    tags[td] = 'selamlar';
+                });
+
+                tags[newtag] = 'selamlar';
+
+                var html = '<tr>';
+                html += '<td>'+newtag+'</td>';
+                html += '<td>1</td>';
+                html += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="'+itemId+'" data-key="'+newtag+'" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
+                html += '</tr>';
+
+                $("#tagsTable").prepend(html);
+
+                buildfire.datastore.save(tags, 'tag_'+itemId ,function(err,data){
+                    if(err)
+                        console.log('there was a problem saving your data');
+                    else
+                        getTags(itemId);
+                });
+            });
+
+
 
             addTagButton.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -283,62 +372,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                 var itemId = me.items[itemIndex].instanceId;
                 //console.log(itemIndex,itemId);
 
-
-
-
-                /* Get Datastore Tags */
-                function getTags(itemId){
-                    buildfire.datastore.get('tag_'+itemId,function(err,data){
-
-                        if(err)
-                            console.log('there was a problem retrieving your data');
-                        else
-                            var vars = data;
-                            console.log(data);
-                        var div = '';
-                        $.each(vars.data, function (key, value) {
-                            div += '<tr class="div_'+key+'">';
-                            div += '<td>'+key+'</td>';
-                            div += '<td>1</td>';
-                            div += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="'+itemId+'" data-key="'+key+'" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
-                            div += '</tr>';
-                        });
-                        document.getElementById("tagsTable").innerHTML = div;
-                    })
-                }
-
-
-                /* Remove Tag */
-                $(document).on('click','.removeButton',function(){
-
-                    var key = $(this).data('key');
-                    var item = $(this).data('item');
-
-
-                    $('.div_'+ key).remove();
-
-                    var tags = {}
-                    $("#tagsTable tr").each(function(){
-                        var td = $(this).find('td').first();
-                        td = td[0].innerHTML;
-                        tags[td] = 'selamlar';
-                    });
-
-                    buildfire.datastore.save(tags, 'tag_'+itemId ,false,function(err,data){
-                        if(err)
-                            console.log('there was a problem saving your data');
-                        else
-                            console.log( 'saved successfully' );
-                    });
-
-
-
-                });
-
                 getTags(itemId);  /* Get Datastore Tags */
-
-
-
 
 
                 $("#addTags").modal({backdrop:false});
