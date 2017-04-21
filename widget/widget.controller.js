@@ -250,73 +250,62 @@
 
 
                     var tagControl = false;
+
+
                     var searchOptions = {
                         "skip": "20",
                         "limit": "10"
                     };
-                    console.log( );
+
                     buildfire.auth.getCurrentUser(function (err, user) {
                         if(err){
                             console.log('there was a problem retrieving your data');
                         }else{
+                            if(!user){
+                                alert('Access Denied.');
+                                return false;
+                            }
+                            if(!user.tags){
+                                alert('Access Denied.');
+                                return false;
+                            }
                             var tags = user.tags[buildfire._context.appId];
+
                             var tagarray = [];
                             for(var k in tags){
-                                tagarray.push = tags[k].tagName
+                                tagarray.push(tags[k].tagName)
                             }
                             buildfire.datastore.search(searchOptions, 'tag_' + plugin.instanceId, function (err, records) {
                                 var plugintags = records;
-                                console.log(tagarray, plugintags)
-                            })
-                        }
-                    })
-                    /*buildfire.auth.getCurrentUser(function (err, user) {
-                        if (err)
-                            console.log('there was a problem retrieving your data');
-                        else {
-                            //console.log('Get User Tags',user.tags);
-                            angular.forEach(user.tags, function (value, key) {
-                                //console.log('DataKey',key);
-                                //console.log('DataValue',value);
-                                angular.forEach(value, function (Datavalue, Datakey) {
-                                    var userTag = Datavalue.tagName;
-                                    buildfire.datastore.search(searchOptions, 'tag_' + plugin.instanceId, function (err, records) {
-                                        if (err)
-                                            console.log('there was a problem retrieving your data');
-                                        else {
-                                            angular.forEach(records, function (value, key) {
-                                                angular.forEach(value.data, function (datakey2, datavalue2) {
-                                                    console.log('DataValue', datavalue2);
-                                                    console.log('userTag', userTag);
-                                                    if (userTag == datavalue2) {
-                                                        tagControl = true;
-                                                    }
-                                                });
-                                            });
-                                        }
+                                var plugintagarray = [];
+                                angular.forEach(records, function (value, key) {
+                                    angular.forEach(value.data, function (valued, keyd) {
+                                        plugintagarray.push(keyd)
                                     });
                                 });
+                                angular.forEach(plugintagarray, function (valued) {
+                                    var plugintg = valued;
+                                    angular.forEach(tagarray, function (tagd) {
+                                        if (plugintg == tagd) {
+                                            tagControl = true;
+                                        }
+                                    }, tagControl);
+                                });
+
+                                if (!tagControl) {
+                                    alert('Access Denied!');
+                                } else {
+                                    buildfire.navigation.navigateTo({
+                                        pluginId: plugin.pluginTypeId,
+                                        instanceId: plugin.instanceId,
+                                        title: plugin.title,
+                                        folderName: plugin.folderName
+                                    });
+                                }
                             });
                         }
                     });
-                    */
-
-                    console.log('Tag Control', tagControl);
-
-                    if (!tagControl) {
-                        alert('Access Denied!');
-                    } else {
-                        buildfire.navigation.navigateTo({
-                            pluginId: plugin.pluginTypeId,
-                            instanceId: plugin.instanceId,
-                            title: plugin.title,
-                            folderName: plugin.folderName
-                        });
-                    }
-
-
                 };
-
 
                 $scope.paging = function () {
                     if ($scope.data.content && $scope.data.content.loadAllPlugins && !loadingData && pagesCount > 1) {
