@@ -32,38 +32,130 @@
                     }
                 }
 
+
+
+                function getUserTags() {
+                    var tagarray = [];
+                    buildfire.auth.getCurrentUser(function (err, user) {
+                        var tags = user.tags[buildfire._context.appId];
+                        for(var k in tags){
+                            tagarray.push(tags[k].tagName);
+                        }
+                    });
+                    return tagarray;
+                };
+
+
+                function searchPluginTags(instanceId) {
+                    var searchOptions = {
+                        "skip": "20",
+                        "limit": "999"
+                    };
+                    var plugintagarray = [];
+
+                    buildfire.datastore.search(searchOptions, 'tag_' + instanceId, function (err, records) {
+
+                        angular.forEach(records, function (value, key) {
+                            angular.forEach(value.data, function (valued, keyd) {
+                                plugintagarray.push(keyd);
+                            });
+
+                        });
+
+                    });
+                    return plugintagarray;
+
+                };
+
+
+
                 function preparePluginsData(plugins) {
-                    if ($scope.data.design.selectedLayout == 5 || $scope.data.design.selectedLayout == 6) {
-                        var temp = [];
-                        var currentItem = 0;
-                        var pluginsLength = plugins.length;
 
-                        for (var i = 0; i < pluginsLength; i++) {
-                            if (i % 2 == 0) {
-                                temp[currentItem] = [];
-                                temp[currentItem].push(plugins[i]);
-                            } else {
-                                temp[currentItem].push(plugins[i]);
 
-                                currentItem++;
+                        if ($scope.data.design.selectedLayout == 5 || $scope.data.design.selectedLayout == 6) {
+                            var temp = [];
+                            var currentItem = 0;
+                            var pluginsLength = plugins.length;
+
+                            for (var i = 0; i < pluginsLength; i++) {
+                                if (i % 2 == 0) {
+                                    temp[currentItem] = [];
+                                    temp[currentItem].push(plugins[i]);
+                                } else {
+                                    temp[currentItem].push(plugins[i]);
+
+                                    currentItem++;
+                                }
                             }
+
+                            var plugins = temp;
+                        } else if ($scope.data.design.selectedLayout == 12) {
+                            var matrix = [], i, k;
+                            var matrix = []
+                            for (i = 0, k = -1; i < plugins.length; i++) {
+                                if (i % 8 === 0) {
+                                    k++;
+                                    matrix[k] = [];
+                                }
+                                matrix[k].push(plugins[i]);
+                            }
+                            var plugins = matrix;
+                        } else {
+                            var plugins = plugins;
                         }
 
-                        $scope.data.plugins = temp;
-                    } else if ($scope.data.design.selectedLayout == 12) {
-                        var matrix = [], i, k;
-                        var matrix = []
-                        for (i = 0, k = -1; i < plugins.length; i++) {
-                            if (i % 8 === 0) {
-                                k++;
-                                matrix[k] = [];
+
+                    $scope.data.plugins = [];
+
+                    angular.forEach(plugins, function (datas,i) {
+
+                        var tagControl = false;
+                        var searchOptions = {
+                            "skip": "20",
+                            "limit": "10"
+                        };
+
+                        buildfire.auth.getCurrentUser(function (err, user) {
+                            if(err){
+                                console.log('there was a problem retrieving your data');
+                            }else{
+
+                                var tags = user.tags[buildfire._context.appId];
+
+                                var tagarray = [];
+                                for(var k in tags){
+                                    tagarray.push(tags[k].tagName)
+                                }
+                                buildfire.datastore.search(searchOptions, 'tag_' + datas.instanceId, function (err, records) {
+                                    var plugintags = records;
+                                    var plugintagarray = [];
+                                    angular.forEach(records, function (value, key) {
+                                        angular.forEach(value.data, function (valued, keyd) {
+                                            plugintagarray.push(keyd)
+                                        });
+                                    });
+                                    angular.forEach(plugintagarray, function (valued) {
+                                        var plugintg = valued;
+                                        angular.forEach(tagarray, function (tagd) {
+                                            if (plugintg == tagd) {
+                                                tagControl = true;
+                                            }
+                                        }, tagControl);
+                                    });
+
+                                    if (tagControl) {
+                                        $scope.data.plugins.push(datas);
+                                        $scope.$apply();
+                                    }
+                                });
                             }
-                            matrix[k].push(plugins[i]);
-                        }
-                        $scope.data.plugins = matrix;
-                    } else {
-                        $scope.data.plugins = plugins;
-                    }
+                        });
+
+                    });
+
+                    console.log('$scope.data.plugins',$scope.data.plugins);
+
+
 
 
                 }
@@ -248,62 +340,11 @@
 
                 $scope.navigateToPlugin = function (plugin) {
 
-
-                    var tagControl = false;
-
-
-                    var searchOptions = {
-                        "skip": "20",
-                        "limit": "10"
-                    };
-
-                    buildfire.auth.getCurrentUser(function (err, user) {
-                        if(err){
-                            console.log('there was a problem retrieving your data');
-                        }else{
-                            if(!user){
-                                alert('Access Denied.');
-                                return false;
-                            }
-                            if(!user.tags){
-                                alert('Access Denied.');
-                                return false;
-                            }
-                            var tags = user.tags[buildfire._context.appId];
-
-                            var tagarray = [];
-                            for(var k in tags){
-                                tagarray.push(tags[k].tagName)
-                            }
-                            buildfire.datastore.search(searchOptions, 'tag_' + plugin.instanceId, function (err, records) {
-                                var plugintags = records;
-                                var plugintagarray = [];
-                                angular.forEach(records, function (value, key) {
-                                    angular.forEach(value.data, function (valued, keyd) {
-                                        plugintagarray.push(keyd)
-                                    });
-                                });
-                                angular.forEach(plugintagarray, function (valued) {
-                                    var plugintg = valued;
-                                    angular.forEach(tagarray, function (tagd) {
-                                        if (plugintg == tagd) {
-                                            tagControl = true;
-                                        }
-                                    }, tagControl);
-                                });
-
-                                if (!tagControl) {
-                                    alert('Access Denied!');
-                                } else {
-                                    buildfire.navigation.navigateTo({
-                                        pluginId: plugin.pluginTypeId,
-                                        instanceId: plugin.instanceId,
-                                        title: plugin.title,
-                                        folderName: plugin.folderName
-                                    });
-                                }
-                            });
-                        }
+                    buildfire.navigation.navigateTo({
+                        pluginId: plugin.pluginTypeId,
+                        instanceId: plugin.instanceId,
+                        title: plugin.title,
+                        folderName: plugin.folderName
                     });
                 };
 
@@ -316,6 +357,8 @@
                             buildfire.spinner.show();
                             currentPage++;
                             searchOptions.pageIndex = currentPage;
+
+
 
                             buildfire.components.pluginInstance.getAllPlugins(searchOptions, function (err, res) {
                                 buildfire.spinner.hide();
@@ -337,12 +380,24 @@
                                     }
                                 } else {
                                     for (var i = 0; i < pluginsLength; i++) {
+
                                         $scope.data.plugins.push(res.data[i]);
+
                                     }
                                 }
 
                                 Utility.digest($scope);
                             });
+
+
+
+
+
+
+
+
+
+
                         }
                     }
                 };

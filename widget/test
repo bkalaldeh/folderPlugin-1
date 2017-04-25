@@ -1,0 +1,40 @@
+                                        var tagControl = false;
+                                        var searchOptions = {
+                                            "skip": "20",
+                                            "limit": "10"
+                                        };
+
+                                        buildfire.auth.getCurrentUser(function (err, user) {
+                                            if(err){
+                                                console.log('there was a problem retrieving your data');
+                                            }else{
+
+                                                var tags = user.tags[buildfire._context.appId];
+
+                                                var tagarray = [];
+                                                for(var k in tags){
+                                                    tagarray.push(tags[k].tagName)
+                                                }
+                                                buildfire.datastore.search(searchOptions, 'tag_' + datas.instanceId, function (err, records) {
+                                                    var plugintags = records;
+                                                    var plugintagarray = [];
+                                                    angular.forEach(records, function (value, key) {
+                                                        angular.forEach(value.data, function (valued, keyd) {
+                                                            plugintagarray.push(keyd)
+                                                        });
+                                                    });
+                                                    angular.forEach(plugintagarray, function (valued) {
+                                                        var plugintg = valued;
+                                                        angular.forEach(tagarray, function (tagd) {
+                                                            if (plugintg == tagd) {
+                                                                tagControl = true;
+                                                            }
+                                                        }, tagControl);
+                                                    });
+
+                                                    if (tagControl) {
+                                                        $scope.data.plugins.push(datas);
+                                                    }
+                                                });
+                                            }
+                                        });
