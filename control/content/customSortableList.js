@@ -41,7 +41,7 @@ buildfire.components.pluginInstance.getAllPlugins = function (options, callback)
         }
         var data = buildfire.components.pluginInstance._mapFromSearch(result);
         console.log(result)
-        callback(err, { total: result.totalRecord, data: data });
+        callback(err, {total: result.totalRecord, data: data});
     });
 },
 
@@ -83,7 +83,10 @@ buildfire.components.pluginInstance.sortableList = function (selector, items, di
     this.loadAllSelector = "#" + this.checkId;
     this.hideLoadButton = hideLoadButton;
     this._loadAllItems = loadAllItems ? true : false;
-    this.dialogOptions = typeof (dialogOptions) == "object" && dialogOptions != null ? dialogOptions : { showIcon: true, confirmDeleteItem: true };
+    this.dialogOptions = typeof (dialogOptions) == "object" && dialogOptions != null ? dialogOptions : {
+        showIcon: true,
+        confirmDeleteItem: true
+    };
     this.widgetOptions = widgetOptions;
     this.init(selector);
     this.loadItems(items);
@@ -187,10 +190,6 @@ buildfire.components.pluginInstance.sortableList.prototype = {
         //addTagButton.setAttribute("ng-click", "this._tagModalOpen('asd')");
 
 
-
-
-
-
         // Add the required classes to the elements
         wrapper.className = "d-item clearfix";
         moveHandle.className = "icon icon-menu cursor-grab pull-left";
@@ -212,7 +211,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             mediaHolder.className = "media-holder pull-left";
             if (item.iconUrl) {
                 media = document.createElement("img");
-                media.src = this._resizeImage(item.iconUrl, { width: 80, height: 40 });
+                media.src = this._resizeImage(item.iconUrl, {width: 80, height: 40});
                 mediaHolder.appendChild(media);
             } else if (item.iconClassName) {
                 media = document.createElement("i");
@@ -244,7 +243,12 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             if (title) {
                 title.addEventListener("click", function (e) {
                     e.preventDefault();
-                    navigationCallback({ pluginId: item.pluginTypeId, instanceId: item.instanceId, folderName: item.folderName, title: item.title });
+                    navigationCallback({
+                        pluginId: item.pluginTypeId,
+                        instanceId: item.instanceId,
+                        folderName: item.folderName,
+                        title: item.title
+                    });
                 });
             }
 
@@ -277,73 +281,82 @@ buildfire.components.pluginInstance.sortableList.prototype = {
 
 
             /* Get Datastore Tags */
-            function getTags(itemId){
+            function getTags(itemId) {
 
                 var loading = '<tr><td colspan="3" align="center"><img src="loading.gif" /></td></tr>';
                 $("#tagsTable").html(loading);
 
-                buildfire.datastore.get('tag_'+itemId,function(err,data){
-                    if(err)
+                buildfire.datastore.get('tag_' + itemId, function (err, data) {
+
+
+                    if (err) {
                         console.log('there was a problem retrieving your data');
-                    else
+                    } else {
                         var vars = data;
-                    console.log(data);
-                    var div = '';
+                        console.log("getTags Function Vars:",vars);
+                        var div = '';
 
 
-                    $.each(vars.data, function (key, value) {
-                        div += '<tr class="div_'+key+'">';
-                        div += '<td>'+key+'</td>';
-                        div += '<td>1</td>';
-                        div += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="'+itemId+'" data-key="'+key+'" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
-                        div += '</tr>';
-                    });
+                        $.each(vars.data, function (key, value) {
+                            div += '<tr class="div_' + key + '">';
+                            div += '<td>' + key + '</td>';
+                            div += '<td>1</td>';
+                            div += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="' + itemId + '" data-key="' + key + '" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
+                            div += '</tr>';
+                        });
+
+
+                        $("input[name='itemId']").val(itemId);
+
+                        document.getElementById("tagsTable").innerHTML = div;
 
 
 
-                    $("input[name='itemId']").val(itemId);
+                        $(".removeButton").click(function (e) {
+                            e.preventDefault();
 
-                    document.getElementById("tagsTable").innerHTML = div;
-                    return false;
+                            var key = $(this).data('key');
+                            var item = $(this).data('item');
+
+                            $('.div_' + key).remove();
+
+                            var tags = {}
+                            $("#tagsTable tr").each(function () {
+                                var td = $(this).find('td').first();
+                                td = td[0].innerHTML;
+                                tags[td] = 'selamlar';
+                            });
+
+                            console.log("removeButton Log getTags Click");
+
+
+                            buildfire.datastore.save(tags, 'tag_' + item, function (err, data) {
+                                if (err)
+                                    console.log('there was a problem saving your data');
+                                else
+                                    console.log('saved successfully');
+                            });
+                        });
+
+
+                    }
                 })
-                return false;
             }
 
 
-            /* Remove Tag */
-            $(document).on('click','.removeButton',function(e){
-                e.preventDefault();
 
-                var key = $(this).data('key');
-                var item = $(this).data('item');
 
-                $('.div_'+ key).remove();
 
-                var tags = {}
-                $("#tagsTable tr").each(function(){
-                    var td = $(this).find('td').first();
-                    td = td[0].innerHTML;
-                    tags[td] = 'selamlar';
-                });
-
-                buildfire.datastore.save(tags, 'tag_'+item ,function(err,data){
-                    if(err)
-                        console.log('there was a problem saving your data');
-                    else
-                        console.log( 'saved successfully' );
-                });
-                return false;
-            });
 
             /* Add Tag */
-            $(document).on('click','.addButton',function(e){
+            document.getElementById('addButtonNew').onclick = function(e){
                 e.preventDefault();
 
                 var newtag = $('.newtaginput').val();
                 var itemId = $("input[name='itemId']").val();
 
                 var tags = {}
-                $("#tagsTable tr").each(function(){
+                $("#tagsTable tr").each(function () {
                     var td = $(this).find('td').first();
                     td = td[0].innerHTML;
                     tags[td] = 'selamlar';
@@ -352,22 +365,22 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                 tags[newtag] = 'selamlar';
 
                 var html = '<tr>';
-                html += '<td>'+newtag+'</td>';
+                html += '<td>' + newtag + '</td>';
                 html += '<td>1</td>';
-                html += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="'+itemId+'" data-key="'+newtag+'" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
+                html += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="' + itemId + '" data-key="' + newtag + '" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
                 html += '</tr>';
 
                 $("#tagsTable").prepend(html);
 
-                buildfire.datastore.save(tags, 'tag_'+itemId ,function(err,data){
-                    if(err)
+                buildfire.datastore.save(tags, 'tag_' + itemId, function (err, data) {
+                    if (err)
                         console.log('there was a problem saving your data');
                     else
+                        console.log("addButton Log getTags Click");
                         getTags(itemId);
                 });
                 return false;
-            });
-
+            };
 
 
             addTagButton.addEventListener("click", function (e) {
@@ -376,10 +389,11 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                 var itemId = me.items[itemIndex].instanceId;
                 //console.log(itemIndex,itemId);
 
-                getTags(itemId);  /* Get Datastore Tags */
+                getTags(itemId);
+                /* Get Datastore Tags */
 
 
-                $("#addTags").modal({backdrop:false});
+                $("#addTags").modal({backdrop: false});
             });
 
         })(item);
@@ -556,8 +570,6 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             buttonSelector.setAttribute("disabled", "disabled");
         }
     }
-
-
 
 
 };
