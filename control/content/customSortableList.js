@@ -304,7 +304,9 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                     $("input[name='itemId']").val(itemId);
 
                     document.getElementById("tagsTable").innerHTML = div;
+                    return false;
                 })
+                return false;
             }
 
 
@@ -330,6 +332,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                     else
                         console.log( 'saved successfully' );
                 });
+                return false;
             });
 
             /* Add Tag */
@@ -362,6 +365,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                     else
                         getTags(itemId);
                 });
+                return false;
             });
 
 
