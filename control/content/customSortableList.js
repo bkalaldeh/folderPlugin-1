@@ -286,8 +286,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                 var loading = '<tr><td colspan="3" align="center"><img src="loading.gif" /></td></tr>';
                 $("#tagsTable").html(loading);
 
-                buildfire.datastore.get('tag_' + itemId, function (err, data) {
-
+                buildfire.datastore.get('tags', function (err, data) {
 
                     if (err) {
                         console.log('there was a problem retrieving your data');
@@ -295,22 +294,23 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                         var vars = data;
                         console.log("getTags Function Vars:",vars);
                         var div = '';
-
-
-                        $.each(vars.data, function (key, value) {
-                            div += '<tr class="div_' + key + '">';
-                            div += '<td>' + key + '</td>';
-                            div += '<td>1</td>';
-                            div += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="' + itemId + '" data-key="' + key + '" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
-                            div += '</tr>';
-                        });
-
+                        vars.data = vars.data && vars.data.length ? vars.data : [];
+                        var pluginTags = $.map( vars.data, function(dataItem) {
+                            return dataItem.id == itemId ? dataItem : null;
+                        })[0];
+                        if(pluginTags && pluginTags.tags) {
+                            $.each(pluginTags.tags, function (key, value) {
+                                div += '<tr class="div_' + key + '">';
+                                div += '<td>' + key + '</td>';
+                                div += '<td>1</td>';
+                                div += '<td><a class="removeButton btn stretch ng-binding btn-danger" data-item="' + itemId + '" data-key="' + key + '" style="margin-top:-15px; position:relative; top:5px;">Remove</a></td>';
+                                div += '</tr>';
+                            });
+                        }
 
                         $("input[name='itemId']").val(itemId);
 
                         document.getElementById("tagsTable").innerHTML = div;
-
-
 
                         $(".removeButton").click(function (e) {
                             e.preventDefault();
@@ -320,24 +320,22 @@ buildfire.components.pluginInstance.sortableList.prototype = {
 
                             $('.div_' + key).remove();
 
-                            var tags = {}
+                            pluginTags.tags = {};
                             $("#tagsTable tr").each(function () {
                                 var td = $(this).find('td').first();
                                 td = td[0].innerHTML;
-                                tags[td] = 'selamlar';
+                                pluginTags.tags[td] = 'selamlar';
                             });
 
                             console.log("removeButton Log getTags Click");
 
-
-                            buildfire.datastore.save(tags, 'tag_' + item, function (err, data) {
+                            buildfire.datastore.save(vars.data, 'tags', function (err, data) {
                                 if (err)
                                     console.log('there was a problem saving your data');
                                 else
                                     console.log('saved successfully');
                             });
                         });
-
 
                     }
                 })
@@ -348,8 +346,9 @@ buildfire.components.pluginInstance.sortableList.prototype = {
 
 
 
+
             /* Add Tag */
-            document.getElementById('addButtonNew').onclick = function(e){
+            document.getElementById('addButtonNew').onclick = function (e) {
                 e.preventDefault();
 
                 var newtag = $('.newtaginput').val();
@@ -372,12 +371,25 @@ buildfire.components.pluginInstance.sortableList.prototype = {
 
                 $("#tagsTable").prepend(html);
 
-                buildfire.datastore.save(tags, 'tag_' + itemId, function (err, data) {
-                    if (err)
-                        console.log('there was a problem saving your data');
-                    else
-                        console.log("addButton Log getTags Click");
+                buildfire.datastore.get('tags', function (err, data) {
+                    data.data = data.data.length ? data.data : [];
+                    var item = $.map(data.data, function(dataItem) {
+                        return dataItem.id == itemId ? dataItem : null;
+                    })[0];
+
+                    if(item) {
+                        item.tags = tags;
+                    } else {
+                        data.data.push({tags: tags, id: itemId});
+                    }
+
+                    buildfire.datastore.save(data.data, 'tags', function (err, data) {
+                        if (err)
+                            console.log('there was a problem saving your data');
+                        else
+                            console.log("addButton Log getTags Click");
                         getTags(itemId);
+                    });
                 });
                 return false;
             };

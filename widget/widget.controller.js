@@ -2,8 +2,8 @@
     "use strict";
     angular
         .module('folderPluginWidget')
-        .controller('folderPluginCtrl', ['$scope', '$sce', '$timeout', '$rootScope', 'Messaging', 'Utility',
-            function ($scope, $sce, $timeout, $rootScope, Messaging, Utility) {
+        .controller('folderPluginCtrl', ['$scope', '$sce', '$timeout', '$rootScope', 'Messaging', 'Utility', '$q',
+            function ($scope, $sce, $timeout, $rootScope, Messaging, Utility, $q) {
                 var view = null;
                 var pagesCount = 0;
                 var currentPage = 0;
@@ -33,22 +33,31 @@
                 }
 
 
-
                 function getUserTags() {
+
+                    var deferred = $q.defer();
+
                     var tagarray = [];
                     buildfire.auth.getCurrentUser(function (err, user) {
                         var tags = user.tags[buildfire._context.appId];
-                        for(var k in tags){
+                        for (var k in tags) {
                             tagarray.push(tags[k].tagName);
                         }
+                        deferred.resolve(tagarray);
                     });
+
+                    deferred.promise;
                     return tagarray;
+
                 };
 
 
                 function searchPluginTags(instanceId) {
+
+                    var deferred = $q.defer();
+
+
                     var searchOptions = {
-                        "skip": "20",
                         "limit": "999"
                     };
                     var plugintagarray = [];
@@ -59,73 +68,72 @@
                             angular.forEach(value.data, function (valued, keyd) {
                                 plugintagarray.push(keyd);
                             });
-
                         });
 
+                        deferred.resolve(plugintagarray);
+
                     });
+                    deferred.promise;
                     return plugintagarray;
 
                 };
 
 
-
                 function preparePluginsData(plugins) {
 
+                    if ($scope.data.design.selectedLayout == 5 || $scope.data.design.selectedLayout == 6) {
+                        var temp = [];
+                        var currentItem = 0;
+                        var pluginsLength = plugins.length;
 
-                        if ($scope.data.design.selectedLayout == 5 || $scope.data.design.selectedLayout == 6) {
-                            var temp = [];
-                            var currentItem = 0;
-                            var pluginsLength = plugins.length;
+                        for (var i = 0; i < pluginsLength; i++) {
+                            if (i % 2 == 0) {
+                                temp[currentItem] = [];
+                                temp[currentItem].push(plugins[i]);
+                            } else {
+                                temp[currentItem].push(plugins[i]);
 
-                            for (var i = 0; i < pluginsLength; i++) {
-                                if (i % 2 == 0) {
-                                    temp[currentItem] = [];
-                                    temp[currentItem].push(plugins[i]);
-                                } else {
-                                    temp[currentItem].push(plugins[i]);
-
-                                    currentItem++;
-                                }
+                                currentItem++;
                             }
-
-                            var plugins = temp;
-                        } else if ($scope.data.design.selectedLayout == 12) {
-                            var matrix = [], i, k;
-                            var matrix = []
-                            for (i = 0, k = -1; i < plugins.length; i++) {
-                                if (i % 8 === 0) {
-                                    k++;
-                                    matrix[k] = [];
-                                }
-                                matrix[k].push(plugins[i]);
-                            }
-                            var plugins = matrix;
-                        } else {
-                            var plugins = plugins;
                         }
 
+                        var plugins = temp;
+                    } else if ($scope.data.design.selectedLayout == 12) {
+                        var matrix = [], i, k;
+                        var matrix = []
+                        for (i = 0, k = -1; i < plugins.length; i++) {
+                            if (i % 8 === 0) {
+                                k++;
+                                matrix[k] = [];
+                            }
+                            matrix[k].push(plugins[i]);
+                        }
+                        var plugins = matrix;
+                    } else {
+                        var plugins = plugins;
+                    }
+
+                    console.log("Plugins List New", plugins);
 
                     $scope.data.plugins = [];
 
-                    angular.forEach(plugins, function (datas,i) {
+                    angular.forEach(plugins, function (datas, i) {
 
                         var tagControl = false;
-                        var searchOptions = {
-                            "skip": "20",
-                            "limit": "10"
-                        };
+                        var searchOptions = {};
 
                         buildfire.auth.getCurrentUser(function (err, user) {
-                            if(err){
+                            if (err) {
                                 console.log('there was a problem retrieving your data');
-                            }else{
+                            } else {
 
                                 var tags = user.tags[buildfire._context.appId];
 
                                 var tagarray = [];
-                                for(var k in tags){
+                                for (var k in tags) {
                                     tagarray.push(tags[k].tagName)
                                 }
+
                                 buildfire.datastore.search(searchOptions, 'tag_' + datas.instanceId, function (err, records) {
                                     var plugintags = records;
                                     var plugintagarray = [];
@@ -134,6 +142,7 @@
                                             plugintagarray.push(keyd)
                                         });
                                     });
+
                                     angular.forEach(plugintagarray, function (valued) {
                                         var plugintg = valued;
                                         angular.forEach(tagarray, function (tagd) {
@@ -148,14 +157,11 @@
                                         $scope.$apply();
                                     }
                                 });
+
                             }
                         });
 
                     });
-
-                    console.log('$scope.data.plugins',$scope.data.plugins);
-
-
 
 
                 }
@@ -359,7 +365,6 @@
                             searchOptions.pageIndex = currentPage;
 
 
-
                             buildfire.components.pluginInstance.getAllPlugins(searchOptions, function (err, res) {
                                 buildfire.spinner.hide();
                                 loadingData = false;
@@ -388,14 +393,6 @@
 
                                 Utility.digest($scope);
                             });
-
-
-
-
-
-
-
-
 
 
                         }
