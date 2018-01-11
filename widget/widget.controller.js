@@ -33,50 +33,16 @@
                 }
 
 
-                function getUserTags() {
-
-                    var deferred = $q.defer();
-
-                    var tagarray = [];
-                    buildfire.auth.getCurrentUser(function (err, user) {
-                        var tags = user.tags[buildfire._context.appId];
-                        for (var k in tags) {
-                            tagarray.push(tags[k].tagName);
+                function getTags(key, tags) {
+                    var r = [];
+                    for (var i = 0; i < tags.length; i++) {
+                        var tag = tags[i];
+                        if (tag.id == key) {
+                            r = tag.tags;
                         }
-                        deferred.resolve(tagarray);
-                    });
-
-                    deferred.promise;
-                    return tagarray;
-
-                };
-
-
-                function searchPluginTags(instanceId) {
-
-                    var deferred = $q.defer();
-
-
-                    var searchOptions = {
-                        "limit": "999"
-                    };
-                    var plugintagarray = [];
-
-                    buildfire.datastore.search(searchOptions, 'tag_' + instanceId, function (err, records) {
-
-                        angular.forEach(records, function (value, key) {
-                            angular.forEach(value.data, function (valued, keyd) {
-                                plugintagarray.push(keyd);
-                            });
-                        });
-
-                        deferred.resolve(plugintagarray);
-
-                    });
-                    deferred.promise;
-                    return plugintagarray;
-
-                };
+                    }
+                    return r;
+                }
 
 
                 function preparePluginsData(plugins) {
@@ -113,55 +79,71 @@
                         var plugins = plugins;
                     }
 
-                    console.log("Plugins List New", plugins);
 
-                    $scope.data.plugins = [];
+                    function tagEngine($scope) {
+                        buildfire.auth.getCurrentUser(function (userError, userData) {
 
-                    angular.forEach(plugins, function (datas, i) {
-
-                        var tagControl = false;
-                        var searchOptions = {};
-
-                        buildfire.auth.getCurrentUser(function (err, user) {
-                            if (err) {
+                            if (userError) {
                                 console.log('there was a problem retrieving your data');
                             } else {
 
-                                var tags = user.tags[buildfire._context.appId];
+                                $scope.data.plugins = [];
+
+                                var tags = userData.tags[buildfire._context.appId];
 
                                 var tagarray = [];
                                 for (var k in tags) {
                                     tagarray.push(tags[k].tagName)
                                 }
 
-                                buildfire.datastore.search(searchOptions, 'tag_' + datas.instanceId, function (err, records) {
-                                    var plugintags = records;
-                                    var plugintagarray = [];
-                                    angular.forEach(records, function (value, key) {
-                                        angular.forEach(value.data, function (valued, keyd) {
-                                            plugintagarray.push(keyd)
-                                        });
-                                    });
+                                var newpluginList = [];
+                                buildfire.datastore.get('tags', function (tagsError, pluginTags) {
 
-                                    angular.forEach(plugintagarray, function (valued) {
-                                        var plugintg = valued;
-                                        angular.forEach(tagarray, function (tagd) {
-                                            if (plugintg == tagd) {
-                                                tagControl = true;
+
+                                    angular.forEach(plugins, function (datas, i) {
+
+                                        var pluginTags2 = getTags(datas.instanceId, pluginTags.data);
+
+
+                                        var keepGoing = true;
+                                        angular.forEach(tagarray, function (value, key1) {
+                                            var usertag = value;
+                                            var pluginTagDataNew = Object.keys(pluginTags2);
+
+                                            if (pluginTagDataNew) {
+                                                angular.forEach(pluginTagDataNew, function (valued, key) {
+
+                                                    if (keepGoing) {
+                                                        if (valued == usertag) {
+                                                            console.log(valued, usertag, datas.instanceId);
+                                                            $scope.data.plugins.push(datas);
+                                                            keepGoing = false;
+                                                        }
+                                                    }
+
+                                                });
                                             }
-                                        }, tagControl);
+                                        });
+
                                     });
 
-                                    if (tagControl) {
-                                        $scope.data.plugins.push(datas);
-                                        $scope.$apply();
-                                    }
+                                    $scope.$apply();
+
                                 });
 
-                            }
-                        });
 
+                            }
+
+
+                        });
+                    }
+
+
+                    buildfire.datastore.onUpdate(function (event) {
+                        tagEngine($scope);
                     });
+
+                    tagEngine($scope);
 
 
                 }

@@ -16,6 +16,7 @@ if (typeof (buildfire.components.pluginInstance) == "undefined")
  pageSize: 20
  }
  */
+
 buildfire.components.pluginInstance.getAllPlugins = function (options, callback) {
     //  var me = this;
     if (typeof (options) == "function") {
@@ -292,13 +293,13 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                         console.log('there was a problem retrieving your data');
                     } else {
                         var vars = data;
-                        console.log("getTags Function Vars:",vars);
+                        console.log("getTags Function Vars:", vars);
                         var div = '';
                         vars.data = vars.data && vars.data.length ? vars.data : [];
-                        var pluginTags = $.map( vars.data, function(dataItem) {
+                        var pluginTags = $.map(vars.data, function (dataItem) {
                             return dataItem.id == itemId ? dataItem : null;
                         })[0];
-                        if(pluginTags && pluginTags.tags) {
+                        if (pluginTags && pluginTags.tags) {
                             $.each(pluginTags.tags, function (key, value) {
                                 div += '<tr class="div_' + key + '">';
                                 div += '<td>' + key + '</td>';
@@ -312,6 +313,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
 
                         document.getElementById("tagsTable").innerHTML = div;
 
+
                         $(".removeButton").click(function (e) {
                             e.preventDefault();
 
@@ -324,7 +326,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                             $("#tagsTable tr").each(function () {
                                 var td = $(this).find('td').first();
                                 td = td[0].innerHTML;
-                                pluginTags.tags[td] = 'selamlar';
+                                pluginTags.tags[td] = 'true';
                             });
 
                             console.log("removeButton Log getTags Click");
@@ -342,11 +344,6 @@ buildfire.components.pluginInstance.sortableList.prototype = {
             }
 
 
-
-
-
-
-
             /* Add Tag */
             document.getElementById('addButtonNew').onclick = function (e) {
                 e.preventDefault();
@@ -358,10 +355,10 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                 $("#tagsTable tr").each(function () {
                     var td = $(this).find('td').first();
                     td = td[0].innerHTML;
-                    tags[td] = 'selamlar';
+                    tags[td] = 'true';
                 });
 
-                tags[newtag] = 'selamlar';
+                tags[newtag] = 'true';
 
                 var html = '<tr>';
                 html += '<td>' + newtag + '</td>';
@@ -373,11 +370,11 @@ buildfire.components.pluginInstance.sortableList.prototype = {
 
                 buildfire.datastore.get('tags', function (err, data) {
                     data.data = data.data.length ? data.data : [];
-                    var item = $.map(data.data, function(dataItem) {
+                    var item = $.map(data.data, function (dataItem) {
                         return dataItem.id == itemId ? dataItem : null;
                     })[0];
 
-                    if(item) {
+                    if (item) {
                         item.tags = tags;
                     } else {
                         data.data.push({tags: tags, id: itemId});
@@ -391,7 +388,7 @@ buildfire.components.pluginInstance.sortableList.prototype = {
                         getTags(itemId);
                     });
                 });
-                return false;
+
             };
 
 
